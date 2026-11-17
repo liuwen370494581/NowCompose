@@ -45,4 +45,12 @@
     <string name="article_list_summary">列表按需组合条目。给每条文章一个稳定的 ID，筛选或删除时仍能正确识别对应内容。</string>
     <string name="article_components_title">把卡片拆成可复用组件</string>
     <string name="article_components_summary">组件接收数据和事件回调，外层负责状态管理。同一个收藏按钮就能同时用在练习页和文章列表中。</string>
+    <string name="articles_loading">正在加载文章…</string>
+    <string name="reload_articles">重新加载</string>
+    <string name="simulate_articles_failure">模拟加载失败</string>
+    <string name="articles_error_title">文章加载失败</string>
+    <string name="articles_error_description">本地演示加载失败了，点击重试即可重新加载。</string>
+    <string name="retry_articles">重试</string>
+    <string name="empty_articles_title">暂无文章</string>
+    <string name="empty_articles_description">当前还没有可展示的文章，可以点击“重新加载”再试一次。</string>
 </resources>
