@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+h
+# Local IDE configuration
+/.idea/
+
+# Android Studio template tests
+/app/src/test/java/com/lw/nowcompose/ExampleUnitTest.kt
+/app/src/androidTest/java/com/lw/nowcompose/ExampleInstrumentedTest.kt
