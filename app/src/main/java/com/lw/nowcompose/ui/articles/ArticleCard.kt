@@ -11,10 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lw.nowcompose.R
+import com.lw.nowcompose.data.model.Article
 import com.lw.nowcompose.ui.components.BookmarkToggle
 import com.lw.nowcompose.ui.theme.NowComposeTheme
 
@@ -36,12 +35,12 @@ fun ArticleCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = stringResource(article.topicRes),
+                        text = article.type,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Text(
-                        text = stringResource(R.string.reading_minutes, article.readingMinutes),
+                        text = article.publishDate,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -51,9 +50,9 @@ fun ArticleCard(
                     onCheckedChange = { onToggleBookmark() },
                 )
             }
-            Text(stringResource(article.titleRes), style = MaterialTheme.typography.titleLarge)
+            Text(article.title, style = MaterialTheme.typography.titleLarge)
             Text(
-                text = stringResource(article.summaryRes),
+                text = article.summary,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -66,6 +65,6 @@ fun ArticleCard(
 @Composable
 private fun ArticleCardPreview() {
     NowComposeTheme(dynamicColor = false) {
-        ArticleCard(article = sampleArticles.first(), isBookmarked = true, onToggleBookmark = {})
+        ArticleCard(article = previewArticles().first(), isBookmarked = true, onToggleBookmark = {})
     }
 }

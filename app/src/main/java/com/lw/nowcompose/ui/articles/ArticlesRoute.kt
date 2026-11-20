@@ -14,7 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ArticlesRoute(
     modifier: Modifier = Modifier,
-    viewModel: ArticlesViewModel = viewModel(),
+    viewModel: ArticlesViewModel = viewModel(factory = ArticlesViewModel.Factory),
 ) {
     // 界面进入后台时停止收集，回到前台时接收最新状态。
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -24,7 +24,6 @@ fun ArticlesRoute(
         onBookmarksOnlyChange = viewModel::setBookmarksOnly,
         onToggleBookmark = viewModel::toggleBookmark,
         onRetry = viewModel::retry,
-        onSimulateFailure = viewModel::simulateLoadFailure,
         modifier = modifier,
     )
 }

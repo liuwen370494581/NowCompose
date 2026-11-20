@@ -24,7 +24,7 @@
     <string name="collapse">收起说明</string>
     <string name="expanded_content">点击事件修改 expanded，AnimatedVisibility 根据新的状态展示内容，并处理进入和退出动画。</string>
     <string name="articles_title">从一张卡片开始</string>
-    <string name="articles_description">本地示例文章。试着收藏，再切换到“只看收藏”；当前收藏未写入本地存储。</string>
+    <string name="articles_description">通过网络加载 Now in Android 官方示例文章，支持收藏和筛选。收藏暂不长期保存。</string>
     <string name="all_articles">全部 · %1$d</string>
     <string name="saved_articles">只看收藏 · %1$d</string>
     <string name="reading_minutes">%1$d 分钟阅读</string>
@@ -49,8 +49,10 @@
     <string name="reload_articles">重新加载</string>
     <string name="simulate_articles_failure">模拟加载失败</string>
     <string name="articles_error_title">文章加载失败</string>
-    <string name="articles_error_description">本地演示加载失败了，点击重试即可重新加载。</string>
+    <string name="articles_error_description">无法连接到文章数据源，请检查网络后重试。</string>
     <string name="retry_articles">重试</string>
     <string name="empty_articles_title">暂无文章</string>
     <string name="empty_articles_description">当前还没有可展示的文章，可以点击“重新加载”再试一次。</string>
+    <string name="articles_http_error_description">文章数据源返回异常，请稍后重试。</string>
+    <string name="articles_data_error_description">文章数据格式异常，暂时无法显示，请稍后重试。</string>
 </resources>

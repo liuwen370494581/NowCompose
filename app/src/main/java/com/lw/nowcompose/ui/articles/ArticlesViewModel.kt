@@ -2,7 +2,13 @@ package com.lw.nowcompose.ui.articles
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.lw.nowcompose.NowComposeApplication
+import com.lw.nowcompose.data.repository.ArticlesRepository
 import java.io.IOException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,9 +17,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import retrofit2.HttpException
 
-class ArticlesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
-    private val repository = DemoArticlesRepository()
+class ArticlesViewModel(
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: ArticlesRepository,
+) : ViewModel() {
     private val loadState = MutableStateFlow<ArticlesFeedState>(ArticlesFeedState.Loading)
     private var loadJob: Job? = null
 
@@ -73,19 +83,41 @@ class ArticlesViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
 
     fun retry() = reload()
 
-    fun simulateLoadFailure() = reload(simulateFailure = true)
-
-    private fun reload(simulateFailure: Boolean = false) {
+    private fun reload() {
         // 新加载取代旧加载，快速重复操作时不会被旧结果覆盖。
         loadJob?.cancel()
         loadState.value = ArticlesFeedState.Loading
         loadJob = viewModelScope.launch {
             try {
-                loadState.value = ArticlesFeedState.Content(repository.loadArticles(simulateFailure))
+                val articles = repository.loadArticles()
+                // 完整列表加载成功后，只保留仍然存在的文章 ID，避免旧演示收藏影响计数。
+                val availableIds = articles.map { it.id }.toSet()
+                savedStateHandle["bookmarked_ids"] = ArrayList(
+                    bookmarkedIds.value.filter { it in availableIds },
+                )
+                loadState.value = ArticlesFeedState.Content(articles)
             } catch (_: IOException) {
-                loadState.value = ArticlesFeedState.Error
+                loadState.value = ArticlesFeedState.Error(ArticleLoadError.NETWORK)
+            } catch (_: HttpException) {
+                loadState.value = ArticlesFeedState.Error(ArticleLoadError.HTTP)
+            } catch (_: SerializationException) {
+                loadState.value = ArticlesFeedState.Error(ArticleLoadError.INVALID_DATA)
             }
             // 只处理预期的加载失败；CancellationException 会自然向上传播。
+        }
+    }
+
+    companion object {
+        // 框架创建 SavedStateHandle；Application 容器提供共享的 Repository。
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
+                    as NowComposeApplication
+                ArticlesViewModel(
+                    savedStateHandle = createSavedStateHandle(),
+                    repository = application.container.articlesRepository,
+                )
+            }
         }
     }
 }

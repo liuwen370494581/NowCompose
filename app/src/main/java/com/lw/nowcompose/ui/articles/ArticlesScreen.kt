@@ -32,7 +32,6 @@ fun ArticlesScreen(
     onBookmarksOnlyChange: (Boolean) -> Unit,
     onToggleBookmark: (String) -> Unit,
     onRetry: () -> Unit,
-    onSimulateFailure: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val loading = uiState.feed is ArticlesFeedState.Loading
@@ -71,13 +70,8 @@ fun ArticlesScreen(
                         },
                     )
                 }
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    TextButton(onClick = onRetry, enabled = !loading) {
-                        Text(stringResource(R.string.reload_articles))
-                    }
-                    TextButton(onClick = onSimulateFailure, enabled = !loading) {
-                        Text(stringResource(R.string.simulate_articles_failure))
-                    }
+                TextButton(onClick = onRetry, enabled = !loading) {
+                    Text(stringResource(R.string.reload_articles))
                 }
             }
         }
@@ -117,10 +111,14 @@ fun ArticlesScreen(
                     },
                 )
             }
-            ArticlesFeedState.Error -> item(key = "error") {
+            is ArticlesFeedState.Error -> item(key = "error") {
                 ArticleStateCard(
                     titleRes = R.string.articles_error_title,
-                    descriptionRes = R.string.articles_error_description,
+                    descriptionRes = when (feed.reason) {
+                        ArticleLoadError.NETWORK -> R.string.articles_error_description
+                        ArticleLoadError.HTTP -> R.string.articles_http_error_description
+                        ArticleLoadError.INVALID_DATA -> R.string.articles_data_error_description
+                    },
                     action = {
                         Button(onClick = onRetry) {
                             Text(stringResource(R.string.retry_articles))
@@ -163,11 +161,12 @@ private fun ArticleStateCard(
 )
 @Composable
 private fun ArticlesContentPreview() {
+    val articles = previewArticles()
     ArticlesStatePreview(
         ArticlesUiState(
-            feed = ArticlesFeedState.Content(sampleArticles),
-            totalCount = sampleArticles.size,
-            bookmarkedIds = listOf(sampleArticles.first().id),
+            feed = ArticlesFeedState.Content(articles),
+            totalCount = articles.size,
+            bookmarkedIds = listOf(articles.first().id),
         ),
     )
 }
@@ -184,7 +183,7 @@ private fun EmptyBookmarksPreview() {
     ArticlesStatePreview(
         ArticlesUiState(
             feed = ArticlesFeedState.Empty,
-            totalCount = sampleArticles.size,
+            totalCount = previewArticles().size,
             bookmarksOnly = true,
         ),
     )
@@ -193,7 +192,9 @@ private fun EmptyBookmarksPreview() {
 @Preview(name = "加载失败", showBackground = true)
 @Composable
 private fun ArticlesErrorPreview() {
-    ArticlesStatePreview(ArticlesUiState(feed = ArticlesFeedState.Error))
+    ArticlesStatePreview(
+        ArticlesUiState(feed = ArticlesFeedState.Error(ArticleLoadError.NETWORK)),
+    )
 }
 
 @Composable
@@ -204,7 +205,6 @@ private fun ArticlesStatePreview(uiState: ArticlesUiState) {
             onBookmarksOnlyChange = {},
             onToggleBookmark = {},
             onRetry = {},
-            onSimulateFailure = {},
         )
     }
 }
